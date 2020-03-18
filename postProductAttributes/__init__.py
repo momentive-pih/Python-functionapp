@@ -172,7 +172,10 @@ def get_product_attributes(req_body):
                         language=item.get("LANGU","").strip()
                         if language=="E" or language=='':
                             idtxt.append(item.get("IDTXT","-"))
-                json_make["relabels"]=", ".join(idtxt)
+                if len(idtxt)>0:
+                    json_make["relabels"]=", ".join(idtxt)
+                else:
+                    json_make["relabels"]="-"
                 basic_details.append(json_make)
                 json_make={}
                 result=[]
@@ -415,7 +418,6 @@ def get_product_attributes(req_body):
                         namprod=total_namprod[0]
                     material_list,bdt_list,matstr,material_details=get_material_details_on_selected_spec(spec_id,params)
                     cas_list,chemical_list,pspec_list,cas_json=get_cas_details_on_selected_spec(spec_id,params)  
-                    print(validity)
                     if validity is None:
                         std_usage=[]
                         hundrd_usage=[]
@@ -480,21 +482,21 @@ def get_product_attributes(req_body):
                                 hundrd_flag=''
                                 inci_flag='' 
                                 for std in std_result:
-                                    if std.get("CSUBI")==item:
+                                    if std.get("CSUBI").strip()==item.strip():
                                         std_flag='s'
                                         json_make["std_Componant_Type"]=std.get("COMPT","-")
                                         json_make["std_value"]=std.get("CVALU","-")
                                         json_make["std_unit"]=std.get("CUNIT","-")
                                 for hundrd in hundrd_result:
-                                    if hundrd.get("CSUBI")==item:
+                                    if hundrd.get("CSUBI").strip()==item.strip():
                                         hundrd_flag='s'
                                         json_make["hundrd_Componant_Type"]=hundrd.get("COMPT","-")
                                         json_make["hundrd_value"]=hundrd.get("CVALU","-")
                                         json_make["hundrd_unit"]=hundrd.get("CUNIT","-")
                                 for inci in inci_result:
                                     data=json.loads(inci.get("DATA_EXTRACT"))
-                                    inci_cas_number=data.get("CAS Number ")
-                                    if inci_cas_number==cas_json.get(item).get("cas_number"):
+                                    inci_cas_number=data.get("CAS Number ").strip()
+                                    if inci_cas_number==cas_json.get(item).get("cas_number").strip():
                                         inci_flag='s'
                                         json_make["inci_Componant_Type"]="Active"
                                         json_make["inci_value_unit"]=data.get("Target Composition","-")
@@ -515,6 +517,11 @@ def get_product_attributes(req_body):
                                     json_make["ingredient_Name"]=cas_json.get(item).get("chemical_name")
                                     json_list.append(json_make)
                                 json_make={}
+                            # total_std_value=0
+                            # total_hundrd_value=0
+                            # total_inci
+                            # for item in json_list:
+
                             return json_list
                         elif sub_category=="Legal Composition":
                             json_list=[]
@@ -571,7 +578,6 @@ def get_product_attributes(req_body):
                                                     json_make["SVT_AN_nine"]=data.get("CUMQT","-")
                                                 if  reg_year=="2020":
                                                     json_make["SVT_AN_twenty"]=data.get("CUMQT","-")
-                                                print(type(data.get("AMTLT","0")))
                                                 json_make["amount_limit_SVT_AN"]=data.get("AMTLT","0")
                                             if reg_value=="SVT_LV":
                                                 if reg_year=="2018":
